@@ -23,6 +23,10 @@ const findContactAndParent = async (attribute, value) => {
 exports.createContact = async (req, res) => {
   try {
     let { email: email_, phoneNumber: phoneNumber_ } = req.body;
+
+    if (email_ === null && phoneNumber_ === null)
+      return res.json({ message: "Need atleast one field" });
+
     if (phoneNumber_ !== null) phoneNumber_ = phoneNumber_.toString();
     const existingContact = await Contact.findOne({
       where: { [Op.and]: [{ phoneNumber: phoneNumber_ }, { email: email_ }] },
@@ -60,13 +64,12 @@ exports.createContact = async (req, res) => {
         ) {
           // if primary contact linked to given phoneNumber is older than primary contact linked to email
           parentId = phoneContact.id;
-          if (email_ !== null && phoneNumber_ !== null)
-            await Contact.create({
-              email: email_,
-              phoneNumber: phoneNumber_,
-              linkedPrecedence: "secondary",
-              linkedId: phoneContact.id,
-            });
+          await Contact.create({
+            email: email_,
+            phoneNumber: phoneNumber_,
+            linkedPrecedence: "secondary",
+            linkedId: phoneContact.id,
+          });
           if (emailContact !== null) {
             await Contact.update(
               {
@@ -86,13 +89,12 @@ exports.createContact = async (req, res) => {
         } else {
           // if primary contact linked to given email is older than primary contact linked to phoneNumber
           parentId = emailContact.id;
-          if (email_ !== null && phoneNumber_ !== null)
-            await Contact.create({
-              email: email_,
-              phoneNumber: phoneNumber_,
-              linkedPrecedence: "secondary",
-              linkedId: emailContact.id,
-            });
+          await Contact.create({
+            email: email_,
+            phoneNumber: phoneNumber_,
+            linkedPrecedence: "secondary",
+            linkedId: emailContact.id,
+          });
           if (phoneContact !== null) {
             await Contact.update(
               {
@@ -113,13 +115,12 @@ exports.createContact = async (req, res) => {
       } else {
         // both parents/pimary are same
         parentId = emailContact.id;
-        if (phoneNumber_ !== null && email_ !== null)
-          await Contact.create({
-            email: email_,
-            phoneNumber: phoneNumber_,
-            linkedPrecedence: "secondary",
-            linkedId: emailContact.id,
-          });
+        await Contact.create({
+          email: email_,
+          phoneNumber: phoneNumber_,
+          linkedPrecedence: "secondary",
+          linkedId: emailContact.id,
+        });
       }
     } else {
       // if contact exists for a given email and phoneNumber just fetch the id of the primaryContact.
