@@ -140,7 +140,8 @@ exports.createContact = async (req, res) => {
     allContacts.forEach((item) => {
       emails.add(item.email);
       phoneNumbers.add(item.phoneNumber);
-      sids.push(item.id);
+      if(item.id!==parentId)
+        sids.push(item.id);
     });
     res.status(200).json({
       contact: {

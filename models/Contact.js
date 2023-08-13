@@ -29,8 +29,10 @@ const Contact = sq.define("contacts", {
   },
 });
 
-Contact.sync().then(() => {
-  console.log("Contact Model synced");
-});
+Contact.sync()
+  .then(() => {
+    console.log("Contact Model synced");
+  })
+  .catch((err) => console.log(err));
 
 module.exports = Contact;
